@@ -1,0 +1,214 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Transactional注解事务解析 | Hawaii</title><meta name="author" content="华宜威"><meta name="copyright" content="华宜威"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="@Transactional注解的事务逻辑是通过Aop代理实现的。生成代理的过程比较复杂，这里只讨论事务的核心逻辑。 1、spring boot的事务管理器spring boot提供了PlatformTransactionManager类来管理事务  可以看到，spring boot只提供了接口，可以允许不同的数据源进行实现。 因为我平时主要使用的是jdbc，因此主要看jdbc的实现类DataSo">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Transactional注解事务解析">
+<meta property="og:url" content="https://hua-yiwei.github.io/2024/01/04/java/%E4%BA%8B%E5%8A%A1/Transactional%E6%B3%A8%E8%A7%A3%E4%BA%8B%E5%8A%A1%E8%A7%A3%E6%9E%90/index.html">
+<meta property="og:site_name" content="Hawaii">
+<meta property="og:description" content="@Transactional注解的事务逻辑是通过Aop代理实现的。生成代理的过程比较复杂，这里只讨论事务的核心逻辑。 1、spring boot的事务管理器spring boot提供了PlatformTransactionManager类来管理事务  可以看到，spring boot只提供了接口，可以允许不同的数据源进行实现。 因为我平时主要使用的是jdbc，因此主要看jdbc的实现类DataSo">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://hua-yiwei.github.io/imgs/article_cover/8.jpg">
+<meta property="article:published_time" content="2024-01-04T00:55:32.000Z">
+<meta property="article:modified_time" content="2024-02-06T06:31:35.336Z">
+<meta property="article:author" content="华宜威">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://hua-yiwei.github.io/imgs/article_cover/8.jpg"><link rel="shortcut icon" href="/imgs/logo.png"><link rel="canonical" href="https://hua-yiwei.github.io/2024/01/04/java/%E4%BA%8B%E5%8A%A1/Transactional%E6%B3%A8%E8%A7%A3%E4%BA%8B%E5%8A%A1%E8%A7%A3%E6%9E%90/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Transactional注解事务解析',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-02-06 14:31:35'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/imgs/avatar.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">11</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">2</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">9</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background-image: url('/imgs/article_cover/8.jpg')"><nav id="nav"><span id="blog-info"><a href="/" title="Hawaii"><span class="site-name">Hawaii</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">Transactional注解事务解析</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-01-04T00:55:32.000Z" title="发表于 2024-01-04 08:55:32">2024-01-04</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-02-06T06:31:35.336Z" title="更新于 2024-02-06 14:31:35">2024-02-06</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/java/">java</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/java/%E4%BA%8B%E5%8A%A1/">事务</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">835</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="Transactional注解事务解析"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><p><code>@Transactional</code>注解的事务逻辑是通过Aop代理实现的。生成代理的过程比较复杂，这里只讨论事务的核心逻辑。</p>
+<h4 id="1、spring-boot的事务管理器"><a href="#1、spring-boot的事务管理器" class="headerlink" title="1、spring boot的事务管理器"></a>1、spring boot的事务管理器</h4><p>spring boot提供了<code>PlatformTransactionManager</code>类来管理事务</p>
+<p><img src="/../../../imgs/image-20240104120620417.png"></p>
+<p>可以看到，spring boot只提供了接口，可以允许不同的数据源进行实现。</p>
+<p>因为我平时主要使用的是jdbc，因此主要看jdbc的实现类<code>DataSourceTransactionManager</code>。</p>
+<p><img src="/../../../imgs/image-20240104121228007.png" alt="image-20240104121228007"></p>
+<p><code>DataSourceTransactionManager</code>类继承了<code>AbstractPlatformTransactionManager</code>抽象类，而<code>AbstractPlatformTransactionManager</code>抽象类又实现了<code>PlatformTransactionManager</code>接口，类图关系如下：</p>
+<p><img src="/../../../imgs/image-20240104152235643.png" alt="image-20240104152235643"></p>
+<h4 id="2、几个重要的方法"><a href="#2、几个重要的方法" class="headerlink" title="2、几个重要的方法"></a>2、几个重要的方法</h4><p>在事务的执行过程中，一般的阶段为：开始事务-&gt;执行sql-&gt;提交事务&#x2F;回滚事务。</p>
+<p>所以当我们看<code>DataSourceTransactionManager</code>类时，有几个方法是需要注意的：<code>doBegin</code>，<code>doCommit</code>，<code>doRollback</code></p>
+<p><img src="/../../../imgs/image-20240104123032371.png" alt="image-20240104123032371"></p>
+<p>另外还有其父类<code>AbstractPlatformTransactionManager</code>的<code>getTransaction</code>和<code>startTransaction</code>方法</p>
+<p><img src="/../../../imgs/image-20240104143534660.png" alt="image-20240104143534660"></p>
+<p>现在先记着这几个方法，后面再验证是否是使用到了这几个方法。</p>
+<h4 id="3、核心代码位置"><a href="#3、核心代码位置" class="headerlink" title="3、核心代码位置"></a>3、核心代码位置</h4><p>从上面的几个方法中，我们可以大致推测，<code>getTransaction</code>和<code>startTransaction</code>以及<code>doBegin</code>是用于开启事务的，<code>doCommit</code>和<code>doRollback</code>用于事务的提交和回滚。</p>
+<blockquote>
+<p>实际上，<code>getTransaction</code>方法内部调用了<code>startTransaction</code>，而<code>startTransaction</code>内部调用的<code>doBegin</code></p>
+</blockquote>
+<p>我们开头提到，<code>@Transactional</code>的事务是通过Aop代理实现的，那么执行的步骤就应该如下所示：</p>
+<p><img src="/../../../imgs/image-20240104145537752.png" alt="image-20240104145537752"></p>
+<p>那么，是哪里拦截了<code>@Transactional</code>修饰的方法(目标方法)，并调用了开启事务的方法？</p>
+<p>因为其代理生成的逻辑比较复杂，这里只找其核心代码。</p>
+<p>在idea中，我们将源码下载下来，并使用<code>ctrl</code>加鼠标左键依次点击开启事务的方法，就能发现，其调用的核心代码在<code>TransactionAspectSupport</code>类中的<code>createTransactionIfNecessary</code>方法中：</p>
+<p><img src="/../../../imgs/image-20240104150341429.png" alt="image-20240104150341429"></p>
+<p><img src="/../../../imgs/image-20240104150459657.png" alt="image-20240104150459657"></p>
+<p>而<code>createTransactionIfNecessary</code>方法又是由<code>invokeWithinTransaction</code>方法调用的</p>
+<p><img src="/../../../imgs/image-20240104150659274.png" alt="image-20240104150659274"></p>
+<p><code>invokeWithinTransaction</code>方法其实就是核心代码</p>
+<h4 id="4、核心代码分析"><a href="#4、核心代码分析" class="headerlink" title="4、核心代码分析"></a>4、核心代码分析</h4><p>上面说了<code>invokeWithinTransaction</code>方法就是核心代码，然后我们只取其中主要的部分进行分析：</p>
+<p><img src="/../../../imgs/image-20240104152647626.png" alt="image-20240104152647626"></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">TransactionInfo</span> <span class="variable">txInfo</span> <span class="operator">=</span> createTransactionIfNecessary(ptm, txAttr, joinpointIdentification);</span><br><span class="line"></span><br><span class="line">Object retVal;</span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="comment">// This is an around advice: Invoke the next interceptor in the chain.</span></span><br><span class="line">    <span class="comment">// This will normally result in a target object being invoked.</span></span><br><span class="line">    retVal = invocation.proceedWithInvocation();</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">catch</span> (Throwable ex) &#123;</span><br><span class="line">    <span class="comment">// target invocation exception</span></span><br><span class="line">    completeTransactionAfterThrowing(txInfo, ex);</span><br><span class="line">    <span class="keyword">throw</span> ex;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">finally</span> &#123;</span><br><span class="line">    cleanupTransactionInfo(txInfo);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (retVal != <span class="literal">null</span> &amp;&amp; vavrPresent &amp;&amp; VavrDelegate.isVavrTry(retVal)) &#123;</span><br><span class="line">    <span class="comment">// Set rollback-only in case of Vavr failure matching our rollback rules...</span></span><br><span class="line">    <span class="type">TransactionStatus</span> <span class="variable">status</span> <span class="operator">=</span> txInfo.getTransactionStatus();</span><br><span class="line">    <span class="keyword">if</span> (status != <span class="literal">null</span> &amp;&amp; txAttr != <span class="literal">null</span>) &#123;</span><br><span class="line">        retVal = VavrDelegate.evaluateTryFailure(retVal, txAttr, status);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">commitTransactionAfterReturning(txInfo);</span><br><span class="line"><span class="keyword">return</span> retVal;</span><br></pre></td></tr></table></figure>
+
+<p>在上述代码中，执行步骤分别是：</p>
+<ol>
+<li>执行<code>createTransactionIfNecessary</code>方法开启事务，</li>
+<li>使用<code>try</code>来执行<code>invocation.proceedWithInvocation()</code>，这个就是执行目标方法</li>
+<li>如果<code>try</code>的执行出现异常，捕获异常，并调用<code>completeTransactionAfterThrowing</code>回滚</li>
+<li>在<code>finally</code>时调用<code>cleanupTransactionInfo</code>方法清除当前节点的事务信息</li>
+<li>最后调用<code>commitTransactionAfterReturning</code>提交事务</li>
+</ol>
+<blockquote>
+<p>ps：<code>completeTransactionAfterThrowing</code>方法中，并不是一定就会回滚，而是看捕获的异常是否是<code>@Transactional</code>中声明的异常的子类，如果是的话就回滚，不是的话就提交</p>
+</blockquote>
+<p>接下来我们打断点看看具体的流程：</p>
+<p>首先进入了<code>createTransactionIfNecessary</code>方法，如下：</p>
+<p><img src="/../../../imgs/image-20240104160216341.png" alt="image-20240104160216341"></p>
+<p>然后<code>createTransactionIfNecessary</code>调用了<code>getTransaction</code>方法</p>
+<p><img src="/../../../imgs/image-20240104160348994.png" alt="image-20240104160348994"></p>
+<p><code>getTransaction</code>方法又调用了<code>startTransaction</code>方法</p>
+<p><img src="/../../../imgs/image-20240104160634986.png" alt="image-20240104160634986"></p>
+<p><code>startTransaction</code>方法调用了<code>doBegin</code>方法</p>
+<p><img src="/../../../imgs/image-20240104160717465.png" alt="image-20240104160717465"></p>
+<p>然后我们可以看到，在<code>doBegin</code>方法里，将事务的提交方式改成了手动提交</p>
+<p><img src="/../../../imgs/image-20240104160941509.png" alt="image-20240104160941509"></p>
+<p>然后回到<code>invokeWithinTransaction</code>方法，并调用目标函数</p>
+<p><img src="/../../../imgs/image-20240104161215730.png" alt="image-20240104161215730"></p>
+<p>最后进行事务的提交</p>
+<p><img src="/../../../imgs/image-20240104161329349.png" alt="image-20240104161329349"></p>
+<p><img src="/../../../imgs/image-20240104161415514.png" alt="image-20240104161415514"></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://hua-yiwei.github.io">华宜威</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://hua-yiwei.github.io/2024/01/04/java/%E4%BA%8B%E5%8A%A1/Transactional%E6%B3%A8%E8%A7%A3%E4%BA%8B%E5%8A%A1%E8%A7%A3%E6%9E%90/">https://hua-yiwei.github.io/2024/01/04/java/%E4%BA%8B%E5%8A%A1/Transactional%E6%B3%A8%E8%A7%A3%E4%BA%8B%E5%8A%A1%E8%A7%A3%E6%9E%90/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://hua-yiwei.github.io" target="_blank">Hawaii</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"></div><div class="post_share"></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/imgs/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">华宜威</div><div class="author-info__description">Hawaii’s blog</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">11</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">2</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">9</div></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#1%E3%80%81spring-boot%E7%9A%84%E4%BA%8B%E5%8A%A1%E7%AE%A1%E7%90%86%E5%99%A8"><span class="toc-number">1.</span> <span class="toc-text">1、spring boot的事务管理器</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2%E3%80%81%E5%87%A0%E4%B8%AA%E9%87%8D%E8%A6%81%E7%9A%84%E6%96%B9%E6%B3%95"><span class="toc-number">2.</span> <span class="toc-text">2、几个重要的方法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3%E3%80%81%E6%A0%B8%E5%BF%83%E4%BB%A3%E7%A0%81%E4%BD%8D%E7%BD%AE"><span class="toc-number">3.</span> <span class="toc-text">3、核心代码位置</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4%E3%80%81%E6%A0%B8%E5%BF%83%E4%BB%A3%E7%A0%81%E5%88%86%E6%9E%90"><span class="toc-number">4.</span> <span class="toc-text">4、核心代码分析</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2024/02/06/java/%E5%B8%B8%E7%94%A8%E7%B1%BB/LocalDate%E7%B1%BB/" title="LocalDate类"><img src="/imgs/article_cover/41.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="LocalDate类"/></a><div class="content"><a class="title" href="/2024/02/06/java/%E5%B8%B8%E7%94%A8%E7%B1%BB/LocalDate%E7%B1%BB/" title="LocalDate类">LocalDate类</a><time datetime="2024-02-06T00:55:32.000Z" title="发表于 2024-02-06 08:55:32">2024-02-06</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/01/20/MySQL/Windows%E4%B8%8A%E5%AE%89%E8%A3%85%E7%AC%AC%E4%BA%8C%E4%B8%AAMySQL/" title="Windows上安装第二个MySQL"><img src="/imgs/article_cover/22.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Windows上安装第二个MySQL"/></a><div class="content"><a class="title" href="/2024/01/20/MySQL/Windows%E4%B8%8A%E5%AE%89%E8%A3%85%E7%AC%AC%E4%BA%8C%E4%B8%AAMySQL/" title="Windows上安装第二个MySQL">Windows上安装第二个MySQL</a><time datetime="2024-01-20T08:21:19.000Z" title="发表于 2024-01-20 16:21:19">2024-01-20</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/01/10/Linux/openVPN/openVPN%E5%81%9A%E4%BB%A3%E7%90%86/" title="openVPN做代理"><img src="/imgs/article_cover/12.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="openVPN做代理"/></a><div class="content"><a class="title" href="/2024/01/10/Linux/openVPN/openVPN%E5%81%9A%E4%BB%A3%E7%90%86/" title="openVPN做代理">openVPN做代理</a><time datetime="2024-01-10T03:50:42.000Z" title="发表于 2024-01-10 11:50:42">2024-01-10</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/01/08/Linux/openVPN/openVPN%E6%90%AD%E5%BB%BA/" title="openVPN搭建"><img src="/imgs/article_cover/8.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="openVPN搭建"/></a><div class="content"><a class="title" href="/2024/01/08/Linux/openVPN/openVPN%E6%90%AD%E5%BB%BA/" title="openVPN搭建">openVPN搭建</a><time datetime="2024-01-08T03:50:42.000Z" title="发表于 2024-01-08 11:50:42">2024-01-08</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/01/04/java/%E4%BA%8B%E5%8A%A1/Transactional%E6%B3%A8%E8%A7%A3%E4%BA%8B%E5%8A%A1%E8%A7%A3%E6%9E%90/" title="Transactional注解事务解析"><img src="/imgs/article_cover/8.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Transactional注解事务解析"/></a><div class="content"><a class="title" href="/2024/01/04/java/%E4%BA%8B%E5%8A%A1/Transactional%E6%B3%A8%E8%A7%A3%E4%BA%8B%E5%8A%A1%E8%A7%A3%E6%9E%90/" title="Transactional注解事务解析">Transactional注解事务解析</a><time datetime="2024-01-04T00:55:32.000Z" title="发表于 2024-01-04 08:55:32">2024-01-04</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2024 By 华宜威</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
