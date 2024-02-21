@@ -1,0 +1,208 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>RocketMQ入门（一） | Hawaii</title><meta name="author" content="华宜威"><meta name="copyright" content="华宜威"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="Linux部署RocketMQ1、环境准备 Linux系统 JDK1.8 源码安装需要安装maven  2、下载RocketMQ安装包本文以二进制包安装的方式 ①下载地址：下载 | RocketMQ (apache.org) ②下载版本：这里下载的是4.4.0版本，并且是二进制包  ③上传到Linux服务器上并解压在&#x2F;usr&#x2F;local目录下创建rocketmq文件夹，然后将下载的二进制包上传到该">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RocketMQ入门（一）">
+<meta property="og:url" content="https://hua-yiwei.github.io/2024/02/15/java/RocketMQ/RocketMQ%E5%85%A5%E9%97%A8%EF%BC%88%E4%B8%80%EF%BC%89/index.html">
+<meta property="og:site_name" content="Hawaii">
+<meta property="og:description" content="Linux部署RocketMQ1、环境准备 Linux系统 JDK1.8 源码安装需要安装maven  2、下载RocketMQ安装包本文以二进制包安装的方式 ①下载地址：下载 | RocketMQ (apache.org) ②下载版本：这里下载的是4.4.0版本，并且是二进制包  ③上传到Linux服务器上并解压在&#x2F;usr&#x2F;local目录下创建rocketmq文件夹，然后将下载的二进制包上传到该">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://hua-yiwei.github.io/imgs/article_cover/29.jpg">
+<meta property="article:published_time" content="2024-02-15T00:55:32.000Z">
+<meta property="article:modified_time" content="2024-02-21T01:10:10.385Z">
+<meta property="article:author" content="华宜威">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://hua-yiwei.github.io/imgs/article_cover/29.jpg"><link rel="shortcut icon" href="/imgs/logo.png"><link rel="canonical" href="https://hua-yiwei.github.io/2024/02/15/java/RocketMQ/RocketMQ%E5%85%A5%E9%97%A8%EF%BC%88%E4%B8%80%EF%BC%89/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'RocketMQ入门（一）',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-02-21 09:10:10'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+        if (t === 'dark') activateDarkMode()
+        else if (t === 'light') activateLightMode()
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/imgs/avatar.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">22</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">2</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">15</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background-image: url('/imgs/article_cover/29.jpg')"><nav id="nav"><span id="blog-info"><a href="/" title="Hawaii"><span class="site-name">Hawaii</span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">RocketMQ入门（一）</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-02-15T00:55:32.000Z" title="发表于 2024-02-15 08:55:32">2024-02-15</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-02-21T01:10:10.385Z" title="更新于 2024-02-21 09:10:10">2024-02-21</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/java/">java</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/java/RocketMQ/">RocketMQ</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">621</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="RocketMQ入门（一）"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="Linux部署RocketMQ"><a href="#Linux部署RocketMQ" class="headerlink" title="Linux部署RocketMQ"></a>Linux部署RocketMQ</h1><h3 id="1、环境准备"><a href="#1、环境准备" class="headerlink" title="1、环境准备"></a>1、环境准备</h3><ul>
+<li>Linux系统</li>
+<li>JDK1.8</li>
+<li>源码安装需要安装maven</li>
+</ul>
+<h3 id="2、下载RocketMQ安装包"><a href="#2、下载RocketMQ安装包" class="headerlink" title="2、下载RocketMQ安装包"></a>2、下载RocketMQ安装包</h3><p>本文以二进制包安装的方式</p>
+<h4 id="①下载地址："><a href="#①下载地址：" class="headerlink" title="①下载地址："></a>①下载地址：</h4><p><a target="_blank" rel="noopener" href="https://rocketmq.apache.org/zh/download/">下载 | RocketMQ (apache.org)</a></p>
+<h4 id="②下载版本："><a href="#②下载版本：" class="headerlink" title="②下载版本："></a>②下载版本：</h4><p>这里下载的是4.4.0版本，并且是二进制包</p>
+<p><img src="/../../../imgs/image-20240215151200528.png" alt="image-20240215151200528"></p>
+<h4 id="③上传到Linux服务器上并解压"><a href="#③上传到Linux服务器上并解压" class="headerlink" title="③上传到Linux服务器上并解压"></a>③上传到Linux服务器上并解压</h4><p>在<code>/usr/local</code>目录下创建<code>rocketmq</code>文件夹，然后将下载的二进制包上传到该目录下</p>
+<p><img src="/../../../imgs/image-20240215151422139.png" alt="image-20240215151422139"></p>
+<p>使用<code>unzip</code>命令进行解压</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">unzip rocketmq-all-4.4.0-bin-release.zip</span><br></pre></td></tr></table></figure>
+
+<p>解压后如图</p>
+<p><img src="/../../../imgs/image-20240215151530482.png" alt="image-20240215151530482"></p>
+<p><img src="/../../../imgs/image-20240215151553524.png" alt="image-20240215151553524"></p>
+<h3 id="3、修改配置文件"><a href="#3、修改配置文件" class="headerlink" title="3、修改配置文件"></a>3、修改配置文件</h3><p>RocketMQ默认使用的内容比较大，修改JVM的大小</p>
+<p>进入<code>bin</code>目录下</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /usr/local/rocketmq/rocketmq-all-4.4.0-bin-release/bin</span><br></pre></td></tr></table></figure>
+
+<p>修改<code>runbroker.sh</code>文件和<code>runserver.sh</code>文件</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim runbroker.sh</span><br></pre></td></tr></table></figure>
+
+<p><img src="/../../../imgs/image-20240215151804081.png" alt="image-20240215151804081"></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim runserver.sh</span><br></pre></td></tr></table></figure>
+
+<p><img src="/../../../imgs/image-20240215151905064.png" alt="image-20240215151905064"></p>
+<h3 id="4、启动RocketMQ"><a href="#4、启动RocketMQ" class="headerlink" title="4、启动RocketMQ"></a>4、启动RocketMQ</h3><h4 id="①启动NameServer"><a href="#①启动NameServer" class="headerlink" title="①启动NameServer"></a>①启动NameServer</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 进入到rockermq解压后的目录下</span></span><br><span class="line"><span class="built_in">cd</span> /usr/local/rocketmq/rocketmq-all-4.4.0-bin-release</span><br><span class="line"><span class="comment"># 新建日志文件夹</span></span><br><span class="line"><span class="built_in">mkdir</span> logs</span><br><span class="line"><span class="comment"># 进入到bin目录下</span></span><br><span class="line"><span class="built_in">cd</span> bin</span><br><span class="line"><span class="comment"># 以后台进程的方式启动NameServer</span></span><br><span class="line"><span class="built_in">nohup</span> sh mqnamesrv &gt;/usr/local/rocketmq/rocketmq-all-4.4.0-bin-release/logs/namesrv.log 2&gt;&amp;1 &amp;</span><br><span class="line"><span class="comment"># 查看启动日志</span></span><br><span class="line"><span class="built_in">tail</span> -f /usr/local/rocketmq/rocketmq-all-4.4.0-bin-release/logs/namesrv.log</span><br></pre></td></tr></table></figure>
+
+<p>日志看到有success说明起动成功</p>
+<p><img src="/../../../imgs/image-20240215152116385.png" alt="image-20240215152116385"></p>
+<h4 id="②起动Broker"><a href="#②起动Broker" class="headerlink" title="②起动Broker"></a>②起动Broker</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 进入bin目录下</span></span><br><span class="line"><span class="built_in">cd</span> /usr/local/rocketmq/rocketmq-all-4.4.0-bin-release/bin</span><br><span class="line"><span class="comment"># 以后台的方式启动Broker</span></span><br><span class="line"><span class="built_in">nohup</span> sh mqbroker -n localhost:9876 &gt;/usr/local/rocketmq/rocketmq-all-4.4.0-bin-release/logs/mqbroker.log 2&gt;&amp;1 &amp;</span><br><span class="line"><span class="comment"># 查看日志</span></span><br><span class="line"><span class="built_in">tail</span> -f /usr/local/rocketmq/rocketmq-all-4.4.0-bin-release/logs/mqbroker.log</span><br></pre></td></tr></table></figure>
+
+<p>看日志是否成功</p>
+<p><img src="/../../../imgs/image-20240215152231015.png" alt="image-20240215152231015"></p>
+<blockquote>
+<p>1、关闭NameServer和Broker的命令</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 进入bin</span></span><br><span class="line"><span class="built_in">cd</span> /usr/local/rocketmq/rocketmq-all-4.4.0-bin-release/bin</span><br><span class="line"><span class="comment"># 1、关闭NameServer</span></span><br><span class="line">sh mqshutdown namesrv</span><br><span class="line"><span class="comment"># 2、关闭Broker</span></span><br><span class="line">sh mqshutdown broker</span><br></pre></td></tr></table></figure>
+
+<p>2、可以使用jps命令看NameServer和Broker是否已经启动成功</p>
+<p><img src="/../../../imgs/image-20240215152342637.png" alt="image-20240215152342637"><br>有服务就说明启动成功</p>
+</blockquote>
+<h3 id="5、测试RocketMQ"><a href="#5、测试RocketMQ" class="headerlink" title="5、测试RocketMQ"></a>5、测试RocketMQ</h3><p>要测试RockerMQ就要开两个终端，一个是作为生产者，一个作为消费者</p>
+<h4 id="终端1：生产者"><a href="#终端1：生产者" class="headerlink" title="终端1：生产者"></a>终端1：生产者</h4><p>生产者负责发送消息，使用安装包自带的demo进行测试</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 进入bin</span></span><br><span class="line"><span class="built_in">cd</span> /usr/local/rocketmq/rocketmq-all-4.4.0-bin-release/bin</span><br><span class="line"><span class="comment"># 设置临时环境变量</span></span><br><span class="line"><span class="built_in">export</span> NAMESRV_ADDR=localhost:9876</span><br><span class="line"><span class="comment"># 使用安装包的demo发送消息</span></span><br><span class="line">sh tools.sh org.apache.rocketmq.example.quickstart.Producer</span><br></pre></td></tr></table></figure>
+
+<h4 id="终端2：消费者"><a href="#终端2：消费者" class="headerlink" title="终端2：消费者"></a>终端2：消费者</h4><p>消费者接受并处理消息</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 进入bin</span></span><br><span class="line"><span class="built_in">cd</span> /usr/local/rocketmq/rocketmq-all-4.4.0-bin-release/bin</span><br><span class="line"><span class="comment"># 设置临时环境变量</span></span><br><span class="line"><span class="built_in">export</span> NAMESRV_ADDR=localhost:9876</span><br><span class="line"><span class="comment"># 接收消息</span></span><br><span class="line">sh tools.sh org.apache.rocketmq.example.quickstart.Consumer</span><br></pre></td></tr></table></figure>
+
+<p>如果看到两个终端都有信息输出，则测试成功</p>
+<p><img src="/../../../imgs/image-20240215152639536.png" alt="image-20240215152639536"></p>
+<p><img src="/../../../imgs/image-20240215152700497.png" alt="image-20240215152700497"></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://hua-yiwei.github.io">华宜威</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://hua-yiwei.github.io/2024/02/15/java/RocketMQ/RocketMQ%E5%85%A5%E9%97%A8%EF%BC%88%E4%B8%80%EF%BC%89/">https://hua-yiwei.github.io/2024/02/15/java/RocketMQ/RocketMQ%E5%85%A5%E9%97%A8%EF%BC%88%E4%B8%80%EF%BC%89/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://hua-yiwei.github.io" target="_blank">Hawaii</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"></div><div class="post_share"></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/imgs/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">华宜威</div><div class="author-info__description">Hawaii’s blog</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">22</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">2</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">15</div></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Linux%E9%83%A8%E7%BD%B2RocketMQ"><span class="toc-text">Linux部署RocketMQ</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1%E3%80%81%E7%8E%AF%E5%A2%83%E5%87%86%E5%A4%87"><span class="toc-text">1、环境准备</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2%E3%80%81%E4%B8%8B%E8%BD%BDRocketMQ%E5%AE%89%E8%A3%85%E5%8C%85"><span class="toc-text">2、下载RocketMQ安装包</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E2%91%A0%E4%B8%8B%E8%BD%BD%E5%9C%B0%E5%9D%80%EF%BC%9A"><span class="toc-text">①下载地址：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E2%91%A1%E4%B8%8B%E8%BD%BD%E7%89%88%E6%9C%AC%EF%BC%9A"><span class="toc-text">②下载版本：</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E2%91%A2%E4%B8%8A%E4%BC%A0%E5%88%B0Linux%E6%9C%8D%E5%8A%A1%E5%99%A8%E4%B8%8A%E5%B9%B6%E8%A7%A3%E5%8E%8B"><span class="toc-text">③上传到Linux服务器上并解压</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3%E3%80%81%E4%BF%AE%E6%94%B9%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6"><span class="toc-text">3、修改配置文件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4%E3%80%81%E5%90%AF%E5%8A%A8RocketMQ"><span class="toc-text">4、启动RocketMQ</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E2%91%A0%E5%90%AF%E5%8A%A8NameServer"><span class="toc-text">①启动NameServer</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E2%91%A1%E8%B5%B7%E5%8A%A8Broker"><span class="toc-text">②起动Broker</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5%E3%80%81%E6%B5%8B%E8%AF%95RocketMQ"><span class="toc-text">5、测试RocketMQ</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BB%88%E7%AB%AF1%EF%BC%9A%E7%94%9F%E4%BA%A7%E8%80%85"><span class="toc-text">终端1：生产者</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BB%88%E7%AB%AF2%EF%BC%9A%E6%B6%88%E8%B4%B9%E8%80%85"><span class="toc-text">终端2：消费者</span></a></li></ol></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2024/02/21/java/%E8%B8%A9%E5%9D%91%E8%AE%B0%E5%BD%95/mybatis-plus%E8%87%AA%E5%8A%A8%E8%AE%BE%E7%BD%AErecords/" title="mybatis-plus自动设置records"><img src="/imgs/article_cover/54.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="mybatis-plus自动设置records"/></a><div class="content"><a class="title" href="/2024/02/21/java/%E8%B8%A9%E5%9D%91%E8%AE%B0%E5%BD%95/mybatis-plus%E8%87%AA%E5%8A%A8%E8%AE%BE%E7%BD%AErecords/" title="mybatis-plus自动设置records">mybatis-plus自动设置records</a><time datetime="2024-02-21T10:25:26.000Z" title="发表于 2024-02-21 18:25:26">2024-02-21</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/02/15/java/RocketMQ/RocketMQ%E5%85%A5%E9%97%A8%EF%BC%88%E4%BA%8C%EF%BC%89/" title="RocketMQ入门（二）"><img src="/imgs/article_cover/19.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="RocketMQ入门（二）"/></a><div class="content"><a class="title" href="/2024/02/15/java/RocketMQ/RocketMQ%E5%85%A5%E9%97%A8%EF%BC%88%E4%BA%8C%EF%BC%89/" title="RocketMQ入门（二）">RocketMQ入门（二）</a><time datetime="2024-02-15T02:55:32.000Z" title="发表于 2024-02-15 10:55:32">2024-02-15</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/02/15/java/RocketMQ/RocketMQ%E5%85%A5%E9%97%A8%EF%BC%88%E4%B8%80%EF%BC%89/" title="RocketMQ入门（一）"><img src="/imgs/article_cover/29.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="RocketMQ入门（一）"/></a><div class="content"><a class="title" href="/2024/02/15/java/RocketMQ/RocketMQ%E5%85%A5%E9%97%A8%EF%BC%88%E4%B8%80%EF%BC%89/" title="RocketMQ入门（一）">RocketMQ入门（一）</a><time datetime="2024-02-15T00:55:32.000Z" title="发表于 2024-02-15 08:55:32">2024-02-15</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/02/15/Linux/Linux%E5%AE%89%E8%A3%85maven/" title="Linux安装maven"><img src="/imgs/article_cover/5.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Linux安装maven"/></a><div class="content"><a class="title" href="/2024/02/15/Linux/Linux%E5%AE%89%E8%A3%85maven/" title="Linux安装maven">Linux安装maven</a><time datetime="2024-02-15T00:10:32.000Z" title="发表于 2024-02-15 08:10:32">2024-02-15</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2024/02/15/Linux/Linux%E5%AE%89%E8%A3%85java/" title="Linux安装java"><img src="/imgs/article_cover/46.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Linux安装java"/></a><div class="content"><a class="title" href="/2024/02/15/Linux/Linux%E5%AE%89%E8%A3%85java/" title="Linux安装java">Linux安装java</a><time datetime="2024-02-15T00:00:32.000Z" title="发表于 2024-02-15 08:00:32">2024-02-15</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2024 By 华宜威</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
